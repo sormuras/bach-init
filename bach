@@ -10,7 +10,7 @@ if [[ $1 == 'init' ]]; then
     echo "Usage: bach init VERSION"
     exit 1
   fi
-  jshell https://github.com/sormuras/bach-init/raw/main/versions/$2.jshell
+  jshell -R-Dbach-version=$2 https://git.io/bach-init
   exit $?
 fi
 

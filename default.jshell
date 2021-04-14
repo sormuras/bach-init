@@ -1,3 +1,8 @@
-System.out.println("/open https://github.com/sormuras/bach-init/raw/main/versions/17-ea-3.jshell")
+var name = System.getProperty("bach-name", "com.github.sormuras.bach")
+var version = System.getProperty("bach-version", "17-ea-3")
 
-/open https://github.com/sormuras/bach-init/raw/main/versions/17-ea-3.jshell
+System.out.printf("Initializing Bach (%s@%s)%n", name, version)
+
+/open https://github.com/sormuras/bach-init/raw/main/init.java
+
+/exit new init(name, version).run()

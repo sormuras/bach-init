@@ -10,7 +10,7 @@ IF "%~1" == "init" (
     ECHO "Usage: bach init VERSION"
     EXIT /B 1
   )
-  jshell https://github.com/sormuras/bach-init/raw/main/versions/%2.jshell
+  jshell -R-Dbach-version=%2 https://git.io/bach-init
   EXIT /B %ERRORLEVEL%
 )
 

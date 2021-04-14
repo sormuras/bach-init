@@ -1,5 +1,0 @@
-System.out.println("Initializing Bach 17-ea-3")
-
-/open https://github.com/sormuras/bach-init/raw/main/init.java
-
-/exit new init("com.github.sormuras.bach", "17-ea-3").run()
