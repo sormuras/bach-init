@@ -19,9 +19,11 @@ record init(String name, String version) {
     try {
       var sor = "https://github.com/sormuras/";
       var tmp = Files.createTempDirectory("bach-init-");
+      var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
       var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
       var mod = load(sor + "bach/releases/download/" + version + "/" + jar, tmp.resolve(jar));
       var bin = createEmptyDirectory(Path.of(".bach", "bin"));
+      Files.copy(bsh, bin.resolve("bach")).toFile().setExecutable(true);
       Files.copy(bat, bin.resolve("bach.bat"));
       Files.copy(mod, bin.resolve(jar));
     } catch (Exception exception) {
@@ -35,7 +37,7 @@ record init(String name, String version) {
     System.out.printf("<< %s%n", uri);
     try (var stream = new URL(uri).openStream()) {
       var size = Files.copy(stream, file);
-      System.out.printf("%,7d %s%n", size, file.getFileName());
+      System.out.printf(">> %,7d %s%n", size, file.getFileName());
     }
     return file;
   }
