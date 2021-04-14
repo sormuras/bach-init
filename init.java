@@ -5,16 +5,17 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-record init(String name, Version version) {
+record init(String name, String version) {
 
   public static void main(String... args) {
-    var version = Version.parse(args.length == 0 ? "17-ea-3" : args[0]);
+    var version = args.length == 0 ? "17-ea-3" : args[0];
     System.exit(new init("com.github.sormuras.bach", version).run());
   }
 
   public int run() {
     var jar = name + "@" + version + ".jar";
     System.out.printf("init (%s@%s)%n", name, version);
+    Version.parse(version);
     try {
       var sor = "https://github.com/sormuras/";
       var tmp = Files.createTempDirectory("bach-init-");
