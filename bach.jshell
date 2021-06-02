@@ -1,0 +1,6 @@
+import com.github.sormuras.bach.*
+
+System.out.print(
+    """
+    Bach %s
+    """.formatted(Bach.version()))
