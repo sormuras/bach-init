@@ -21,10 +21,12 @@ record init(String name, String version) {
       var tmp = Files.createTempDirectory("bach-init-");
       var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
       var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
+      var jsh = load(sor + "bach-init/raw/main/bach.jshell", tmp.resolve("bach.jshell"));
       var mod = load(sor + "bach/releases/download/" + version + "/" + jar, tmp.resolve(jar));
       var bin = createEmptyDirectory(Path.of(".bach", "bin"));
       Files.copy(bsh, bin.resolve("bach")).toFile().setExecutable(true);
       Files.copy(bat, bin.resolve("bach.bat"));
+      Files.copy(jsh, bin.resolve("bach.jshell"));
       Files.copy(mod, bin.resolve(jar));
     } catch (Exception exception) {
       exception.printStackTrace(System.err);
