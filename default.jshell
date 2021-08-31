@@ -1,5 +1,5 @@
 var name = System.getProperty("bach-name", "com.github.sormuras.bach")
-var version = System.getProperty("bach-version", "17-ea-6")
+var version = System.getProperty("bach-version", "17-M1")
 
 System.out.printf("Initializing Bach (%s@%s)%n", name, version)
 
