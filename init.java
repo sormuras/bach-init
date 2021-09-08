@@ -8,7 +8,7 @@ import java.nio.file.Path;
 record init(String name, String version) {
 
   public static void main(String... args) {
-    var version = args.length == 0 ? "17-M1" : args[0];
+    var version = args.length == 0 ? "17-M2" : args[0];
     System.exit(new init("com.github.sormuras.bach", version).run());
   }
 
