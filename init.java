@@ -80,7 +80,7 @@ record init(String module, String slug) {
         "-d",
         classes.toString());
 
-    var jar = Path.of(module + ".jar");
+    var jar = temp.resolve(module + ".jar");
     run(
         "jar",
         "--create",
@@ -95,7 +95,7 @@ record init(String module, String slug) {
         root.resolve(module).resolve("src/main/java").toString(),
         ".");
     System.out.println("<< " + Files.size(jar));
-    return jar.toAbsolutePath();
+    return jar;
   }
 
   void run(String name, String... args) {
