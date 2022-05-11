@@ -1,8 +1,8 @@
 var name = System.getProperty("bach-name", "com.github.sormuras.bach")
-var version = System.getProperty("bach-version", "17-M4")
+var slug = System.getProperty("bach-slug", "HEAD")
 
-System.out.printf("Initializing Bach (%s@%s)%n", name, version)
+System.out.printf("Initializing Bach (%s@%s)%n", name, slug)
 
 /open https://github.com/sormuras/bach-init/raw/main/init.java
 
-/exit new init(name, version).run()
+/exit new init(name, slug).run()

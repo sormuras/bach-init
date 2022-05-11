@@ -14,6 +14,12 @@ Initializes Bach in the current working directory by installing a default versio
 > 
 > See <https://github.blog/2011-11-10-git-io-github-url-shortener> for details.
 
-In order to initialize a specific version of Bach in the current working directory, launch `jshell` with an explicit and valid `VERSION` token like this:
+In order to initialize a specific version of Bach in the current working directory, launch `jshell` with an explicit and valid `SLUG` token like this:
 
-`jshell -R-Dbach-version=$VERSION https://git.io/bach-init`
+`jshell -R-Dbach-slug=$SLUG https://git.io/bach-init`
+
+Examples for valid slugs include:
+
+- `HEAD` _default_ resolves to <https://github.com/sormuras/bach/tree/HEAD>
+- `${BRANCH}` resolves to <https://github.com/sormuras/bach/tree/BRANCH>
+- `${TAG}` resolves to <https://github.com/sormuras/bach/tree/TAG>

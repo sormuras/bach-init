@@ -1,29 +1,33 @@
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.lang.module.ModuleDescriptor.Version;
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.spi.ToolProvider;
 
-record init(String name, String version) {
+record init(String module, String slug) {
 
   public static void main(String... args) {
-    var version = args.length == 0 ? "17-M4" : args[0];
-    System.exit(new init("com.github.sormuras.bach", version).run());
+    var slug = args.length == 0 ? "HEAD" : args[0];
+    System.exit(new init("com.github.sormuras.bach", slug).run());
   }
 
   public int run() {
-    var jar = name + "@" + version + ".jar";
-    System.out.printf("init (%s@%s)%n", name, version);
-    Version.parse(version);
+    var jar = module + ".jar";
+    System.out.printf("init %s @ %s%n", module, slug);
+
     try {
       var sor = "https://github.com/sormuras/";
       var tmp = Files.createTempDirectory("bach-init-");
       var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
       var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
       var jsh = load(sor + "bach-init/raw/main/bach.jshell", tmp.resolve("bach.jshell"));
-      var mod = load(sor + "bach/releases/download/" + version + "/" + jar, tmp.resolve(jar));
-      var bin = createEmptyDirectory(Path.of(".bach", "bin"));
+      var zip = load(sor + "bach/archive/" + slug + ".zip", tmp.resolve(slug + ".zip"));
+
+      var mod = compile(extract(zip));
+      var bin = refresh(Path.of(".bach", "bin"));
+
       Files.copy(bsh, bin.resolve("bach")).toFile().setExecutable(true);
       Files.copy(bat, bin.resolve("bach.bat"));
       Files.copy(jsh, bin.resolve("bach.jshell"));
@@ -35,7 +39,7 @@ record init(String name, String version) {
     return 0;
   }
 
-  public Path load(String uri, Path file) throws Exception {
+  Path load(String uri, Path file) throws Exception {
     System.out.printf("<< %s%n", uri);
     try (var stream = new URL(uri).openStream()) {
       var size = Files.copy(stream, file);
@@ -44,17 +48,76 @@ record init(String name, String version) {
     return file;
   }
 
-  public static Path createEmptyDirectory(Path directory) throws Exception {
+  Path extract(Path zip) throws Exception {
+    var temp = zip.getParent();
+    var process =
+        new ProcessBuilder("jar", "--extract", "--file", zip.getFileName().toString())
+            .directory(temp.toFile())
+            .inheritIO()
+            .start();
+    if (process.waitFor() != 0) throw new Error("Extraction failed!");
+    try (var stream = Files.find(temp, 2, (p, a) -> p.endsWith(module) && a.isDirectory())) {
+      return stream.findFirst().orElseThrow().getParent();
+    }
+  }
+
+  Path compile(Path root) throws Exception {
+    var version = Files.readString(root.resolve("VERSION")) + "+" + slug;
+    var temp = root.getParent();
+    var classes = temp.resolve("classes");
+    run(
+        "javac",
+        "--module",
+        module,
+        "--module-source-path",
+        root + File.separator + String.join(File.separator, "*", "src", "main", "java"),
+        "-g",
+        "-parameters",
+        "-Werror",
+        "-Xlint",
+        "-encoding",
+        "UTF-8",
+        "-d",
+        classes.toString());
+
+    var jar = Path.of(module + ".jar");
+    run(
+        "jar",
+        "--create",
+        "--file=" + jar,
+        "--module-version=" + version + "+" + Instant.now().truncatedTo(ChronoUnit.SECONDS),
+        "--main-class",
+        module + ".Main",
+        "-C",
+        classes.resolve(module).toString(),
+        ".",
+        "-C",
+        root.resolve(module).resolve("src/main/java").toString(),
+        ".");
+    System.out.println("<< " + Files.size(jar));
+    return jar.toAbsolutePath();
+  }
+
+  void run(String name, String... args) {
+    System.out.println(">> " + name + " " + String.join(" ", args));
+    var tool = ToolProvider.findFirst(name).orElseThrow();
+    var code = tool.run(System.out, System.err, args);
+    if (code != 0) throw new Error("Non-zero exit code: " + code);
+  }
+
+  Path refresh(Path directory) throws Exception {
     if (Files.notExists(directory)) return Files.createDirectories(directory);
-    Files.newDirectoryStream(directory, Files::isRegularFile).forEach(init::delete);
+    try (var stream = Files.newDirectoryStream(directory, Files::isRegularFile)) {
+      stream.forEach(this::remove);
+    }
     return directory;
   }
 
-  private static void delete(Path path) {
+  void remove(Path path) {
     try {
       Files.delete(path);
-    } catch (IOException exception) {
-      throw new UncheckedIOException(exception);
+    } catch (Exception exception) {
+      throw new Error(exception);
     }
   }
 }
