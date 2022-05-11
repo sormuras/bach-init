@@ -2,20 +2,25 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.spi.ToolProvider;
 
-record init(String module, String slug) {
+record init(String module, String version) {
 
-  public static void main(String... args) {
-    var slug = args.length == 0 ? "HEAD" : args[0];
-    System.exit(new init("com.github.sormuras.bach", slug).run());
+  private static final Path GIT_IGNORE_FILE = Path.of(".bach", ".gitignore");
+  private static final Path VERSION_FILE = Path.of(".bach", "bach-init.version");
+
+  public static void main(String... args) throws Exception {
+    var slug = args.length == 1 ? args[0] : readVersionFromFileOrElseReturnMain();
+    var init = new init("com.github.sormuras.bach", slug);
+    System.exit(init.run());
   }
 
-  public int run() {
-    var jar = module + ".jar";
-    System.out.printf("Initializing %s @ %s...%n", module, slug);
+  static String readVersionFromFileOrElseReturnMain() throws Exception {
+    return Files.exists(VERSION_FILE) ? Files.readString(VERSION_FILE) : "main";
+  }
+
+  int run() {
+    System.out.printf("Initializing %s @ %s...%n", module, version);
 
     try {
       var sor = "https://github.com/sormuras/";
@@ -23,7 +28,7 @@ record init(String module, String slug) {
       var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
       var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
       var jsh = load(sor + "bach-init/raw/main/bach.jshell", tmp.resolve("bach.jshell"));
-      var zip = load(sor + "bach/archive/" + slug + ".zip", tmp.resolve("bach-" + slug + ".zip"));
+      var zip = load(sor + "bach/archive/" + version + ".zip", tmp.resolve(version + ".zip"));
 
       var mod = compile(extract(zip));
       var bin = refresh(Path.of(".bach", "bin"));
@@ -31,26 +36,38 @@ record init(String module, String slug) {
       Files.copy(bsh, bin.resolve("bach")).toFile().setExecutable(true);
       Files.copy(bat, bin.resolve("bach.bat"));
       Files.copy(jsh, bin.resolve("bach.jshell"));
-      Files.copy(mod, bin.resolve(jar));
+      Files.copy(mod, bin.resolve(module + ".jar"));
+
+      if (Files.notExists(GIT_IGNORE_FILE)) Files.writeString(GIT_IGNORE_FILE, generateGitIgnore());
+      Files.writeString(VERSION_FILE, version);
     } catch (Exception exception) {
       exception.printStackTrace(System.err);
       return 1;
     }
-    System.out.printf(
-        """
-
-        Bach successfully initialized in %s
-        
-        Next steps?
-          - Print project information   -> %2$s info
-          - Re-initialize (update) Bach -> %2$s init main (HEAD,${BRANCH},${TAG})
-          - Print usage help message    -> %2$s --help
-        
-        Have fun!
-        """,
-        Path.of("").toAbsolutePath().toUri(),
-        Path.of(".bach/bin/bach"));
+    System.out.print(generateNextStepsMessage());
     return 0;
+  }
+
+  String generateGitIgnore() {
+    return """
+           out/
+           *.jar
+           """;
+  }
+
+  String generateNextStepsMessage() {
+    return """
+
+           Bach successfully initialized in %s
+
+           Next steps?
+             - Print project information   -> %2$s info
+             - Re-initialize (update) Bach -> %2$s init main (HEAD,${BRANCH},${TAG})
+             - Print usage help message    -> %2$s --help
+
+           Have fun!
+           """
+        .formatted(Path.of("").toAbsolutePath().toUri(), Path.of(".bach/bin/bach"));
   }
 
   Path load(String uri, Path file) throws Exception {
@@ -76,7 +93,6 @@ record init(String module, String slug) {
   }
 
   Path compile(Path root) throws Exception {
-    var version = Files.readString(root.resolve("VERSION")) + "+" + slug;
     var temp = root.getParent();
     var classes = temp.resolve("classes");
     run(
@@ -94,12 +110,13 @@ record init(String module, String slug) {
         "-d",
         classes.toString());
 
-    var jar = temp.resolve(module + ".jar");
+    var file = temp.resolve(module + ".jar");
+    var read = Files.readString(root.resolve("VERSION"));
     run(
         "jar",
         "--create",
-        "--file=" + jar,
-        "--module-version=" + version + "+" + Instant.now().truncatedTo(ChronoUnit.SECONDS),
+        "--file=" + file,
+        "--module-version=" + (version.equals(read) ? read : read + "+" + version),
         "--main-class",
         module + ".Main",
         "-C",
@@ -108,8 +125,8 @@ record init(String module, String slug) {
         "-C",
         root.resolve(module).resolve("src/main/java").toString(),
         ".");
-    System.out.println("<< " + Files.size(jar));
-    return jar;
+    System.out.println("<< " + Files.size(file));
+    return file;
   }
 
   void run(String name, String... args) {

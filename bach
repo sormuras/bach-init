@@ -16,7 +16,7 @@ if [[ $1 == 'init' ]]; then
     echo "Usage: bach init SLUG"
     exit 1
   fi
-  jshell -R-Dbach-slug="$2" https://git.io/bach-init
+  jshell -R-Dbach-version="$2" https://git.io/bach-init
   exit $?
 fi
 

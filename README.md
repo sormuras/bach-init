@@ -4,22 +4,25 @@ Bach's Initialization Program
 
 ## Usage
 
+Initialize Bach in the current working directory by installing a default version.
+
 `jshell https://git.io/bach-init`
 
-Initializes Bach in the current working directory by installing a default version.
+Once initialized successfully subsequent runs are started by using the following command:
 
-> <https://git.io/bach-init> expands to <https://github.com/sormuras/bach-init/raw/main/default.jshell>.
-> 
-> Created via `curl -i https://git.io -F "url=https://github.com/sormuras/bach-init/raw/main/default.jshell" -F "code=bach-init"`
-> 
-> See <https://github.blog/2011-11-10-git-io-github-url-shortener> for details.
+- `.bach/bin/bach init VERSION` (Linux, Mac)
+- `.bach\bin\bach init VERSION` (Linux, Mac)
 
-In order to initialize a specific version of Bach in the current working directory, launch `jshell` with an explicit and valid `SLUG` token like this:
-
-`jshell -R-Dbach-slug=$SLUG https://git.io/bach-init`
-
-Examples for valid slugs include:
+Examples for valid `VERSION` tokens include:
 
 - `main` (_default_) resolves to <https://github.com/sormuras/bach/tree/main>
-- `${BRANCH}` resolves to <https://github.com/sormuras/bach/tree/BRANCH>
-- `${TAG}` resolves to <https://github.com/sormuras/bach/tree/TAG>
+- `HEAD` resolves to <https://github.com/sormuras/bach/tree/HEAD>
+- `17` (_soon_) resolves to <https://github.com/sormuras/bach/tree/17>
+
+## Remarks
+
+> <https://git.io/bach-init> expands to <https://github.com/sormuras/bach-init/raw/main/default.jshell>.
+>
+> Created via `curl -i https://git.io -F "url=https://github.com/sormuras/bach-init/raw/main/default.jshell" -F "code=bach-init"`
+>
+> See <https://github.blog/2011-11-10-git-io-github-url-shortener> for details.
