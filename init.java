@@ -10,8 +10,8 @@ record init(String module, String version) {
   private static final Path VERSION_FILE = Path.of(".bach", "bach-init.version");
 
   public static void main(String... args) throws Exception {
-    var slug = args.length == 1 ? args[0] : readVersionFromFileOrElseReturnMain();
-    var init = new init("com.github.sormuras.bach", slug);
+    var version = args.length == 1 ? args[0] : readVersionFromFileOrElseReturnMain();
+    var init = new init("com.github.sormuras.bach", version);
     System.exit(init.run());
   }
 

@@ -13,10 +13,10 @@ IF "%~1" == "clean" (
 
 IF "%~1" == "init" (
   IF "%~2" == "" (
-    ECHO "Usage: bach init SLUG"
+    ECHO "Usage: bach init VERSION"
     EXIT /B 1
   )
-  jshell -R-Dbach-slug=%2 https://git.io/bach-init
+  jshell -R-Dbach-version=%2 https://git.io/bach-init
   EXIT /B
 )
 
