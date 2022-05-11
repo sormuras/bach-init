@@ -20,6 +20,6 @@ In order to initialize a specific version of Bach in the current working directo
 
 Examples for valid slugs include:
 
-- `HEAD` _default_ resolves to <https://github.com/sormuras/bach/tree/HEAD>
+- `main` (_default_) resolves to <https://github.com/sormuras/bach/tree/main>
 - `${BRANCH}` resolves to <https://github.com/sormuras/bach/tree/BRANCH>
 - `${TAG}` resolves to <https://github.com/sormuras/bach/tree/TAG>

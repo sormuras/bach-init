@@ -1,5 +1,5 @@
 var name = System.getProperty("bach-name", "com.github.sormuras.bach")
-var slug = System.getProperty("bach-slug", "HEAD")
+var slug = System.getProperty("bach-slug", "main")
 
 System.out.printf("Initializing Bach (%s@%s)%n", name, slug)
 

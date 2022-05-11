@@ -15,7 +15,7 @@ record init(String module, String slug) {
 
   public int run() {
     var jar = module + ".jar";
-    System.out.printf("init %s @ %s%n", module, slug);
+    System.out.printf("Initializing %s @ %s...%n", module, slug);
 
     try {
       var sor = "https://github.com/sormuras/";
@@ -23,7 +23,7 @@ record init(String module, String slug) {
       var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
       var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
       var jsh = load(sor + "bach-init/raw/main/bach.jshell", tmp.resolve("bach.jshell"));
-      var zip = load(sor + "bach/archive/" + slug + ".zip", tmp.resolve(slug + ".zip"));
+      var zip = load(sor + "bach/archive/" + slug + ".zip", tmp.resolve("bach-" + slug + ".zip"));
 
       var mod = compile(extract(zip));
       var bin = refresh(Path.of(".bach", "bin"));
@@ -36,6 +36,20 @@ record init(String module, String slug) {
       exception.printStackTrace(System.err);
       return 1;
     }
+    System.out.printf(
+        """
+
+        Bach successfully initialized in %s
+        
+        Next steps?
+          - Print project information   -> %2$s info
+          - Re-initialize (update) Bach -> %2$s init main (HEAD,${BRANCH},${TAG})
+          - Print usage help message    -> %2$s --help
+        
+        Have fun!
+        """,
+        Path.of("").toAbsolutePath().toUri(),
+        Path.of(".bach/bin/bach"));
     return 0;
   }
 
