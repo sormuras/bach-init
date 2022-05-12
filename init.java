@@ -7,7 +7,7 @@ import java.util.spi.ToolProvider;
 record init(String module, String version) {
 
   private static final Path GIT_IGNORE_FILE = Path.of(".bach", ".gitignore");
-  private static final Path VERSION_FILE = Path.of(".bach", "bach-init.version");
+  private static final Path VERSION_FILE = Path.of(".bach", "bin", "bach-init.version");
 
   public static void main(String... args) throws Exception {
     var version = args.length == 1 ? args[0] : readVersionFromFileOrElseReturnMain();
