@@ -97,6 +97,8 @@ record init(String module, String version) {
     var classes = temp.resolve("classes");
     run(
         "javac",
+        "--release",
+        "17",
         "--module",
         module,
         "--module-source-path",
