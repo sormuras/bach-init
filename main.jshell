@@ -10,13 +10,13 @@ System.out.printf("| Java %s (%s)%n",
     System.getProperty("java.home"))
 
 var code = 0
-var require = 19
+var minimal = 17
 var feature = Runtime.version().feature()
 
-if (feature >= require) {
+if (feature >= minimal) {
   System.out.println("| Go go go!");
 } else {
-  System.err.printf("%nJava %d or higher required, running on %s%n", require, feature);
+  System.err.printf("%nJava %d or higher is required, running on %s%n", minimal, feature);
   code = 1;
 }
 
