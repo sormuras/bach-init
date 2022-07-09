@@ -1,3 +1,21 @@
-System.out.println("bach-init/main.jshell")
+System.out.printf("| %s (%s, %s)%n",
+    System.getProperty("os.name"),
+    System.getProperty("os.arch"),
+    System.getProperty("user.dir"))
 
-/exit 0
+System.out.printf("| Java %s (%s)%n",
+    System.getProperty("java.version"),
+    System.getProperty("java.home"))
+
+var code = 0
+var require = 19
+var feature = Runtime.version().feature()
+
+if (feature >= require) {
+  System.out.println("| Go go go!");
+} else {
+  System.err.printf("%nJava %d or higher required, running on %s%n", require, feature);
+  code = 1;
+}
+
+/exit code
