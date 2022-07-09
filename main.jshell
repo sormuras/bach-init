@@ -1,4 +1,4 @@
-System.out.printf("| Initialize Bach -- %s", "https://github.com/sormuras/bach-init")
+System.out.printf("| Initialize Bach -- %s%n", "https://github.com/sormuras/bach-init")
 
 System.out.printf("| %s (%s, %s)%n",
     System.getProperty("os.name"),
