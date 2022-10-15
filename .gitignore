@@ -1,3 +1,5 @@
 .bach/
 .idea/
+*.class
+*.iml
 *.jar

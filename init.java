@@ -1,45 +1,40 @@
-import java.io.File;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.spi.ToolProvider;
+import java.nio.file.StandardCopyOption;
 
-record init(String module, String version) {
+record init(String version) {
 
   private static final Path GIT_IGNORE_FILE = Path.of(".bach", ".gitignore");
-  private static final Path VERSION_FILE = Path.of(".bach", "bin", "bach-init.version");
+  private static final Path INIT_VERSION_FILE = Path.of(".bach", "init.version");
 
   public static void main(String... args) throws Exception {
     var version = args.length == 1 ? args[0] : readVersionFromFileOrElseReturnMain();
-    var init = new init("com.github.sormuras.bach", version);
+    var init = new init(version);
     System.exit(init.run());
   }
 
   static String readVersionFromFileOrElseReturnMain() throws Exception {
-    return Files.exists(VERSION_FILE) ? Files.readString(VERSION_FILE) : "main";
+    return Files.exists(INIT_VERSION_FILE) ? Files.readString(INIT_VERSION_FILE) : "main";
   }
 
   int run() {
-    System.out.printf("Initializing %s @ %s...%n", module, version);
+    System.out.printf("Initializing Bach %s...%n", version);
 
     try {
       var sor = "https://github.com/sormuras/";
       var tmp = Files.createTempDirectory("bach-init-");
-      var bsh = load(sor + "bach-init/raw/main/bach", tmp.resolve("bach"));
-      var bat = load(sor + "bach-init/raw/main/bach.bat", tmp.resolve("bach.bat"));
-      var jsh = load(sor + "bach-init/raw/main/bach.jshell", tmp.resolve("bach.jshell"));
-      var zip = load(sor + "bach/archive/" + version + ".zip", tmp.resolve(version + ".zip"));
+      var zip = load(sor + "bach/archive/" + version + ".zip", tmp.resolve("bach-archive-" + version + ".zip"));
 
-      var mod = compile(extract(zip));
-      var bin = refresh(Path.of(".bach", "bin"));
+      extract(zip);
 
-      Files.copy(bsh, bin.resolve("bach")).toFile().setExecutable(true);
-      Files.copy(bat, bin.resolve("bach.bat"));
-      Files.copy(jsh, bin.resolve("bach.jshell"));
-      Files.copy(mod, bin.resolve(module + ".jar"));
+      //noinspection ResultOfMethodCallIgnored
+      Path.of(".bach/bin/bach").toFile().setExecutable(true, true);
 
+      Files.createDirectories(GIT_IGNORE_FILE.getParent());
       if (Files.notExists(GIT_IGNORE_FILE)) Files.writeString(GIT_IGNORE_FILE, generateGitIgnore());
-      Files.writeString(VERSION_FILE, version);
+      Files.writeString(INIT_VERSION_FILE, version);
     } catch (Exception exception) {
       exception.printStackTrace(System.err);
       return 1;
@@ -62,7 +57,6 @@ record init(String module, String version) {
 
            Next steps?
              - Print project information   -> %2$s info
-             - Re-initialize (update) Bach -> %2$s init main (HEAD,${BRANCH},${TAG})
              - Print usage help message    -> %2$s --help
 
            Have fun!
@@ -79,78 +73,22 @@ record init(String module, String version) {
     return file;
   }
 
-  Path extract(Path zip) throws Exception {
-    var temp = zip.getParent();
-    var process =
-        new ProcessBuilder("jar", "--extract", "--file", zip.getFileName().toString())
-            .directory(temp.toFile())
-            .inheritIO()
-            .start();
-    if (process.waitFor() != 0) throw new Error("Extraction failed!");
-    try (var stream = Files.find(temp, 2, (p, a) -> p.endsWith(module) && a.isDirectory())) {
-      return stream.findFirst().orElseThrow().getParent();
-    }
-  }
-
-  Path compile(Path root) throws Exception {
-    var temp = root.getParent();
-    var classes = temp.resolve("classes");
-    run(
-        "javac",
-        "--release",
-        "17",
-        "--module",
-        module,
-        "--module-source-path",
-        root + File.separator + String.join(File.separator, "*", "src", "main", "java"),
-        "-g",
-        "-parameters",
-        "-Werror",
-        "-Xlint",
-        "-encoding",
-        "UTF-8",
-        "-d",
-        classes.toString());
-
-    var file = temp.resolve(module + ".jar");
-    var read = Files.readString(root.resolve("VERSION"));
-    run(
-        "jar",
-        "--create",
-        "--file=" + file,
-        "--module-version=" + (version.equals(read) ? read : read + "+" + version),
-        "--main-class",
-        module + ".Main",
-        "-C",
-        classes.resolve(module).toString(),
-        ".",
-        "-C",
-        root.resolve(module).resolve("src/main/java").toString(),
-        ".");
-    System.out.println("<< " + Files.size(file));
-    return file;
-  }
-
-  void run(String name, String... args) {
-    System.out.println(">> " + name + " " + String.join(" ", args));
-    var tool = ToolProvider.findFirst(name).orElseThrow();
-    var code = tool.run(System.out, System.err, args);
-    if (code != 0) throw new Error("Non-zero exit code: " + code);
-  }
-
-  Path refresh(Path directory) throws Exception {
-    if (Files.notExists(directory)) return Files.createDirectories(directory);
-    try (var stream = Files.newDirectoryStream(directory, Files::isRegularFile)) {
-      stream.forEach(this::remove);
-    }
-    return directory;
-  }
-
-  void remove(Path path) {
-    try {
-      Files.delete(path);
-    } catch (Exception exception) {
-      throw new Error(exception);
+  void extract(Path zip) throws Exception {
+    try (var fs = FileSystems.newFileSystem(zip)) {
+      for (var root : fs.getRootDirectories()) {
+        try (var stream = Files.walk(root)) {
+          var list = stream
+                  .filter(Files::isRegularFile).toList();
+          for (var file : list) {
+            var string = file.toString();
+            if (string.contains(".bach/bin") || string.contains(".bach/src/run.bach")) {
+              var target = Path.of(file.subpath(1, file.getNameCount()).toString());
+              Files.createDirectories(target.getParent());
+              Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+          }
+        }
+      }
     }
   }
 }
