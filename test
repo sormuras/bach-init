@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-jshell --show-version https://git.io/bach-init
+wget https://init.java.bach.run -x -O .bach/init.java
+
+java .bach/init.java
 
 export PATH=$PATH:.bach/bin
 
-bach boot test.jshell
-
-bach build
+bach --verbose info

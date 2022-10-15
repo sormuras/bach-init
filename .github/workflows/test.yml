@@ -11,9 +11,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: oracle-actions/setup-java@v1
-        with:
-          website: oracle.com
-          release: 17
       - uses: actions/checkout@v3
       - run: bash test

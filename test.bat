@@ -1,9 +1,9 @@
 @ECHO ON
 
-jshell --show-version https://git.io/bach-init
+REM wget https://init.java.bach.run -x -O .bach/init.java
+
+java init.java
 
 PATH=%PATH%;.bach\bin
 
-bach boot test.jshell
-
-bach build
+bach --verbose info
