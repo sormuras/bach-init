@@ -4,7 +4,7 @@ set -x
 
 wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java
 
-$JAVA_HOME/bin/java .bach/init.java
+java .bach/init.java
 
 export PATH=$PATH:.bach/bin
 
