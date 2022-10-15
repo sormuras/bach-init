@@ -6,7 +6,7 @@ Bach's Initialization Program
 
 Download Bach's `init.java` program into directory `.bach`. For example via `wget`:
 
-- `wget https://init.java.bach.run -x -O .bach/init.java`
+- `wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run`
 
 Initialize Bach with the following command:
 

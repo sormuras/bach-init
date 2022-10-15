@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-wget https://init.java.bach.run -x -O .bach/init.java
+set -x
 
-java .bach/init.java
+wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run
+
+$JAVA_HOME/bin/java .bach/init.java
 
 export PATH=$PATH:.bach/bin
 

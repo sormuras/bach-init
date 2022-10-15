@@ -1,6 +1,8 @@
+REM #!cmd.exe
+
 @ECHO ON
 
-REM wget https://init.java.bach.run -x -O .bach/init.java
+REM wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run
 
 java init.java
 
