@@ -1,8 +1,0 @@
-Project.
-  ofDefaults().
-  withModule("foo").
-  initializeInCurrentWorkingDirectory()
-
-Bach.ofSystem().run("build")
-
-/exit
