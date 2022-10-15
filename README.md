@@ -6,13 +6,13 @@ Bach's Initialization Program
 
 Download Bach's `init.java` program into directory `.bach`. For example via `wget`:
 
-- `wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run`
+- `wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java`
 
 Initialize Bach with the following command:
 
-- `java .bach/init.java <VERSION>`
+- `java .bach/init.java [<VERSION>]`
 
-Examples for valid `VERSION` tokens include:
+Examples for the optional `VERSION` tokens include:
 
 - `main` (_default_) resolves to <https://github.com/sormuras/bach/tree/main>
 - `HEAD` resolves to <https://github.com/sormuras/bach/tree/HEAD>

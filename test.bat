@@ -2,7 +2,7 @@ REM #!cmd.exe
 
 @ECHO ON
 
-REM wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run
+REM wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java
 
 java init.java
 

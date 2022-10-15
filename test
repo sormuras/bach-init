@@ -2,7 +2,7 @@
 
 set -x
 
-wget --no-verbose --force-directories --output-document .bach/init.java https://init.java.bach.run
+wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java
 
 $JAVA_HOME/bin/java .bach/init.java
 
