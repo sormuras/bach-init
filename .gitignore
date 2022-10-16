@@ -1,5 +1,6 @@
 .bach/
 .idea/
+example/
 *.class
 *.iml
 *.jar

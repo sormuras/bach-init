@@ -2,10 +2,14 @@ REM #!cmd.exe
 
 @ECHO ON
 
-REM wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java
+mkdir example && cd example
 
-java init.java
+echo Files.copy(URI.create("https://init.java.bach.run").toURL().openStream(), Files.createDirectories(Path.of(".bach")).resolve("init.java")) | jshell -
 
-PATH=%PATH%;.bach\bin
+java .bach\init.java
 
-bach --verbose info
+call .bach\bin\bach --verbose info
+
+cd ..
+
+rmdir /Q /S example

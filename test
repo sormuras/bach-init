@@ -2,10 +2,14 @@
 
 set -x
 
-wget --directory-prefix .bach https://raw.githubusercontent.com/sormuras/bach-init/main/init.java
+mkdir example && cd example
+
+echo 'Files.copy(URI.create("https://init.java.bach.run").toURL().openStream(), Files.createDirectories(Path.of(".bach")).resolve("init.java"))' | jshell -
 
 java .bach/init.java
 
-export PATH=$PATH:.bach/bin
+.bach/bin/bach --verbose info
 
-bach --verbose info
+cd ..
+
+rm --recursive --force example
